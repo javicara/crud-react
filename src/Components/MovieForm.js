@@ -13,7 +13,7 @@ const MovieForm = (props) => {
       .required("Required"),
     fecha_de_creacion: Yup.date().required("Required")
   });
-  console.log(props);
+  //console.log(props);
   return (
     <div className="form-wrapper" >
       <Formik {...props} >

@@ -7,39 +7,35 @@ import MovieForm from "./MovieForm";
 
 // EditMovie Component
 const EditMovie = (props) => {
-const [formValues, setFormValues] = useState({
-	name: "",
-	email: "",
-	rollno: "",
-});
+	const [formValues, setFormValues] =
+	useState({ title: '', image: '', score: '',is_movie:'',fecha_de_creacion:''})
 	
 //onSubmit handler
-const onSubmit = (MovieObject) => {
-	axios
-	.put(
-		"http://localhost:4000/Movies/update-Movie/" +
-		props.match.params.id,
-		MovieObject
-	)
-	.then((res) => {
-		if (res.status === 200) {
+const onSubmit = async(MovieObject) => {
+	console.log('entra')
+	try {
+		const res = await axios.put("http://localhost:3002/api/v1/movies/" +
+		props.match.params.id,MovieObject);
 		alert("Movie successfully updated");
 		props.history.push("/Movie-list");
-		} else Promise.reject();
-	})
-	.catch((err) => alert("Something went wrong"));
+		console.log(res);
+	  } catch (error) {
+		console.error(error);
+	  }
+
 };
 
 // Load data from server and reinitialize Movie form
 useEffect(() => {
 	axios
 	.get(
-		"http://localhost:4000/Movies/update-Movie/"
+		"http://localhost:3002/api/v1/movies/"
 		+ props.match.params.id
 	)
 	.then((res) => {
-		const { name, email, rollno } = res.data;
-		setFormValues({ name, email, rollno });
+		console.log(res.data.data)
+		const { title, image, score,is_movie,fecha_de_creacion } = res.data.data;
+		setFormValues({ title, image, score,is_movie,fecha_de_creacion});
 	})
 	.catch((err) => console.log(err));
 }, []);

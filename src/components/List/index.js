@@ -1,59 +1,116 @@
 import React, { useEffect, useState } from "react";
 import "./List.css";
-import {Modal, ModalBody, ModalHeader,ModalFooter}from 'reactstrap'
-import { convertToObject } from "typescript";
+import { Form } from "react-bootstrap";
+import { Modal, ModalBody, ModalHeader, ModalFooter } from "reactstrap";
+import Moment from "moment";
 
 const axios = require("axios");
-
-
 
 function List() {
   const [films, setFilms] = useState([]);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
+  const [genres, setGenres] = useState([]);
 
   const [selectedFilm, setSelectedFilm] = useState({
-    movie_id:"",
-    title:"",
-    image:"",
-    fecha_de_creacion:"",
-    score:"",
-    is_movie:"",
-    gender_id:"",
-    gender:"",
-    characters:""
+    movie_id: "",
+    title: "",
+    image: "",
+    fecha_de_creacion: "",
+    score: "",
+    is_movie: undefined,
+    gender_id: "",
+    characters: "",
   });
 
   const selectFilm = (elemento, modal) => {
-   // console.log(elemento, modal)
-    getFilmDetails(elemento.movie_id)
+    // console.log(elemento, modal)
+    getFilmDetails(elemento.movie_id);
     modal === "Editar" && setModalEditar(true);
     modal === "Eliminar" && setModalEliminar(true);
   };
 
   useEffect(() => {
     getFilms();
+    getGenres();
   }, []);
+
+  async function getGenres() {
+    try {
+      let response = await axios.get("http://localhost:3002/api/v1/genders");
+      response = response.data.data;
+      let genresAux = [];
+      response.map((g) => {
+        genresAux.push(g);
+      });
+      setGenres(genresAux);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "date") {
+      let fecha = Moment(value).format("MM/DD/YYYY");
+      console.log(fecha);
+      setSelectedFilm((prevState) => ({
+        ...prevState,
+        [name]: fecha,
+      }));
+    } else {
+      setSelectedFilm((prevState) => ({
+        ...prevState,
+        [name]: value,
+        
+      }));
+    }
+   
+  };
+
+  const eliminar = async () => {
+    try {
+      let response = await axios.delete(
+        "http://localhost:3002/api/v1/movies/" + selectedFilm.movie_id
+      );
+      console.log(response);
+      //vUELVO A ACTUALIZAR EL ESTADO DE LAS PELICULAS, QUIZAS SE PODRIA HACER SIN VOLVER A LLAMAR A LA API PERO VA BIEN
+      getFilms();
+      setModalEliminar(false);
+      //response = response.data.data;
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const editar =async () => {
+    
+    try {
+      let response = await axios.put(
+        "http://localhost:3002/api/v1/movies/" + selectedFilm.movie_id,selectedFilm
+      );
+      console.log(response);
+      //vUELVO A ACTUALIZAR EL ESTADO DE LAS PELICULAS, QUIZAS SE PODRIA HACER SIN VOLVER A LLAMAR A LA API PERO VA BIEN
+      getFilms();
+      setModalEditar(false);
+      //response = response.data.data;
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   
-
- const handleChange=()=>{
-     //console.log(selectedFilm);
- }
-
- const editar=()=>{
-     console.log('Actualizarrr')
- }
   async function getFilms() {
     try {
       let response = await axios.get("http://localhost:3002/api/v1/movies");
       response = response.data.data;
 
       let dataAux = [];
-      response.map((film) => {
+      response.forEach((film) => {
         dataAux.push(film);
       });
       setFilms(dataAux);
-      console.log(films);
+      //console.log('aca',films);
     } catch (error) {
       console.error(error);
     }
@@ -61,12 +118,13 @@ function List() {
 
   async function getFilmDetails(id) {
     try {
-      let response = await axios.get("http://localhost:3002/api/v1/movies/"+id);
+      let response = await axios.get(
+        "http://localhost:3002/api/v1/movies/" + id
+      );
       response = response.data.data;
 
-      console.log(response);
+      console.log("con detalle(genero y characters)", response);
       setSelectedFilm(response);
-     
     } catch (error) {
       console.error(error);
     }
@@ -100,11 +158,17 @@ function List() {
                 {" "}
                 <button
                   className="btn btn-primary"
-                  onClick={() =>selectFilm(film, "Editar")}
+                  onClick={() => selectFilm(film, "Editar")}
                 >
-                  Editar {" "}
+                  Editar{" "}
                 </button>
-                {" - "} <button className="btn btn-danger">Eliminar </button>
+                {" - "}{" "}
+                <button
+                  className="btn btn-danger"
+                  onClick={() => selectFilm(film, "Eliminar")}
+                >
+                  Eliminar{" "}
+                </button>
               </td>
             </tr>
           ))}
@@ -121,10 +185,10 @@ function List() {
           <div className="form-group">
             <label>ID</label>
             <input
-              className="form-control"
               readOnly
+              className="form-control"
               type="text"
-              name="id"
+              name="movie_id"
               value={selectedFilm && selectedFilm.movie_id}
             />
             <br />
@@ -132,9 +196,19 @@ function List() {
             <label>Titulo</label>
             <input
               className="form-control"
+              placeholder="Titulo de la pelicula"
               type="text"
-              name="titulo"
+              name="title"
               value={selectedFilm && selectedFilm.title}
+              onChange={handleChange}
+            />
+            <br />
+            <label>Imagen</label>
+            <input
+              className="form-control"
+              type="text"
+              name="image"
+              value={selectedFilm && selectedFilm.image}
               onChange={handleChange}
             />
             <br />
@@ -148,6 +222,52 @@ function List() {
               onChange={handleChange}
             />
             <br />
+            <label>Genero</label>
+            <Form.Select
+              aria-label="Default select example"
+              className="selectGenre"
+              name="gender_id"
+              onChange={handleChange}
+              value={selectedFilm.gender_id}
+            >
+              {/* Aca iria un map que me muestre las opciones de genero */}
+
+              {genres.map((option) => (
+                <option
+                  onChange={handleChange}
+                  key={option.gender_id}
+                  value={option.gender_id}
+                  name="gender_id"
+                >
+                  {option.name}
+                </option>
+              ))}
+            </Form.Select>
+            <div key={"inline-radio"} className="radios">
+              <Form.Check
+                inline
+                type="radio"
+                label="Pelicula"
+                name="is_movie"
+                value="true"
+                checked={selectedFilm.is_movie=== "true"}
+                onChange={handleChange}
+              />
+              <br></br>
+              <Form.Check
+                inline
+                type="radio"
+                label="Serie"
+                name="is_movie"
+                value="false"
+                checked={selectedFilm.is_movie=== "false"}
+                onChange={handleChange}
+              />
+
+              
+            </div>
+      
+
             <label>Score</label>
             <input
               className="form-control"
@@ -159,7 +279,7 @@ function List() {
             <br />
           </div>
         </ModalBody>
-       <ModalFooter>
+        <ModalFooter>
           <button className="btn btn-primary" onClick={() => editar()}>
             Actualizar
           </button>
@@ -171,25 +291,25 @@ function List() {
           </button>
         </ModalFooter>
       </Modal>
-{/*  
-      <Modal isOpen={modalEliminar}>
-        <ModalBody>
-          Estás Seguro que deseas eliminar el país{" "}
-          {paisSeleccionado && paisSeleccionado.nombre}
-        </ModalBody>
-        <ModalFooter>
-          <button className="btn btn-danger" onClick={() => eliminar()}>
-            Sí
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => setModalEliminar(false)}
-          >
-            No
-          </button>
-        </ModalFooter>
-      </Modal>
-
+      {
+        <Modal isOpen={modalEliminar}>
+          <ModalBody>
+            Estás Seguro que deseas eliminar la pelicula {selectedFilm.title}{" "}
+            {selectedFilm.title && selectedFilm.movie_id}
+          </ModalBody>
+          <ModalFooter>
+            <button className="btn btn-danger" onClick={() => eliminar()}>
+              Sí
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setModalEliminar(false)}
+            >
+              No
+            </button>
+          </ModalFooter>
+        </Modal>
+        /* 
       <Modal isOpen={modalInsertar}>
         <ModalHeader>
           <div>
@@ -240,7 +360,8 @@ function List() {
             Cancelar
           </button>
         </ModalFooter> 
-      </Modal>*/}
+      </Modal>*/
+      }
     </div>
   );
 }

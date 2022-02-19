@@ -9,7 +9,7 @@ function Films(props) {
     image: "",
     score: "",
     is_movie: "",
-    genre_id: "",
+    gender_id: "",
     fecha_de_creacion: "",
   });
 
@@ -113,7 +113,7 @@ function Films(props) {
             <Form.Select
               aria-label="Default select example"
               className="selectGenre"
-              name="genre_id"
+              name="gender_id"
               onChange={handleChange}
             >
               {/* Aca iria un map que me muestre las opciones de genero */}
@@ -122,7 +122,7 @@ function Films(props) {
                 <option
                   key={option.gender_id}
                   value={option.gender_id}
-                  name="genre_id"
+                  name="gender_id"
                 >
                   {option.name}
                 </option>

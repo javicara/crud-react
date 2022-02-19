@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import {Films} from './Films'
 import {Characters} from './Characters'
 import {Genres} from './Genres'
+import {List} from './List'
+
 
 
 
@@ -27,9 +29,9 @@ export default class NavbarComp extends Component {
                   <Nav.Link as={Link} to={"/characters"}>
                     Characters
                   </Nav.Link>
-                  <NavDropdown title="Dropdown" id="collasible-nav-dropdown">
-                    <NavDropdown.Item href="#action/3.1">
-                      Action
+                  <NavDropdown title="Lists" id="collasible-nav-dropdown">
+                    <NavDropdown.Item as={Link} to={"/film-list"}>
+                      Films
                     </NavDropdown.Item>
                     <NavDropdown.Item href="#action/3.2">
                       Another action
@@ -62,6 +64,9 @@ export default class NavbarComp extends Component {
               </Route>
               <Route path="/characters">
                 <Characters/>
+              </Route>
+              <Route path="/film-list">
+                <List/>
               </Route>
               <Route path="/">
                 <Films />

@@ -51,7 +51,17 @@ function List() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "date") {
+    console.log('name: ',name, ' value: ',typeof(value));
+    
+    if (name === "is_movie") {
+      let boolValue = (value == "true");
+      console.log(typeof(boolValue))
+      setSelectedFilm((prevState) => ({
+        ...prevState,
+        [name]: boolValue,
+      }));
+      
+    } else if (name === "date") {
       let fecha = Moment(value).format("MM/DD/YYYY");
       console.log(fecha);
       setSelectedFilm((prevState) => ({
@@ -250,7 +260,7 @@ function List() {
                 label="Pelicula"
                 name="is_movie"
                 value="true"
-                checked={selectedFilm.is_movie=== "true"}
+                checked={selectedFilm.is_movie === true}
                 onChange={handleChange}
               />
               <br></br>
@@ -260,7 +270,7 @@ function List() {
                 label="Serie"
                 name="is_movie"
                 value="false"
-                checked={selectedFilm.is_movie=== "false"}
+                checked={selectedFilm.is_movie=== false}
                 onChange={handleChange}
               />
 

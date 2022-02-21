@@ -51,16 +51,15 @@ function List() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log('name: ',name, ' value: ',typeof(value));
-    
+    console.log("name: ", name, " value: ", typeof value);
+
     if (name === "is_movie") {
-      let boolValue = (value == "true");
-      console.log(typeof(boolValue))
+      let boolValue = value == "true";
+      console.log(typeof boolValue);
       setSelectedFilm((prevState) => ({
         ...prevState,
         [name]: boolValue,
       }));
-      
     } else if (name === "date") {
       let fecha = Moment(value).format("MM/DD/YYYY");
       console.log(fecha);
@@ -72,10 +71,8 @@ function List() {
       setSelectedFilm((prevState) => ({
         ...prevState,
         [name]: value,
-        
       }));
     }
-   
   };
 
   const eliminar = async () => {
@@ -93,11 +90,11 @@ function List() {
     }
   };
 
-  const editar =async () => {
-    
+  const editar = async () => {
     try {
       let response = await axios.put(
-        "http://localhost:3002/api/v1/movies/" + selectedFilm.movie_id,selectedFilm
+        "http://localhost:3002/api/v1/movies/" + selectedFilm.movie_id,
+        selectedFilm
       );
       console.log(response);
       //vUELVO A ACTUALIZAR EL ESTADO DE LAS PELICULAS, QUIZAS SE PODRIA HACER SIN VOLVER A LLAMAR A LA API PERO VA BIEN
@@ -109,7 +106,6 @@ function List() {
     }
   };
 
-  
   async function getFilms() {
     try {
       let response = await axios.get("http://localhost:3002/api/v1/movies");
@@ -270,13 +266,20 @@ function List() {
                 label="Serie"
                 name="is_movie"
                 value="false"
-                checked={selectedFilm.is_movie=== false}
+                checked={selectedFilm.is_movie === false}
                 onChange={handleChange}
               />
 
-              
+              {selectedFilm.is_movie ? (
+                <b>
+                  <p>PELICULA ESTA SELECIONADO</p>{" "}
+                </b>
+              ) : (
+                <b>
+                  <p>SERIE ESTA SELECIONADO</p>
+                </b>
+              )}
             </div>
-      
 
             <label>Score</label>
             <input
@@ -319,58 +322,6 @@ function List() {
             </button>
           </ModalFooter>
         </Modal>
-        /* 
-      <Modal isOpen={modalInsertar}>
-        <ModalHeader>
-          <div>
-            <h3>Insertar País</h3>
-          </div>
-        </ModalHeader>
-        <ModalBody>
-          <div className="form-group">
-            <label>ID</label>
-            <input
-              className="form-control"
-              readOnly
-              type="text"
-              name="id"
-              value={data[data.length - 1].id + 1}
-            />
-            <br />
-
-            <label>País</label>
-            <input
-              className="form-control"
-              type="text"
-              name="nombre"
-              value={paisSeleccionado ? paisSeleccionado.nombre : ""}
-              onChange={handleChange}
-            />
-            <br />
-
-            <label>Minutos</label>
-            <input
-              className="form-control"
-              type="text"
-              name="minutos"
-              value={paisSeleccionado ? paisSeleccionado.minutos : ""}
-              onChange={handleChange}
-            />
-            <br />
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <button className="btn btn-primary" onClick={() => insertar()}>
-            Insertar
-          </button>
-          <button
-            className="btn btn-danger"
-            onClick={() => setModalInsertar(false)}
-          >
-            Cancelar
-          </button>
-        </ModalFooter> 
-      </Modal>*/
       }
     </div>
   );

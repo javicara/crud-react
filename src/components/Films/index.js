@@ -23,10 +23,10 @@ function Films(props) {
         "http://localhost:3002/api/v1/movies",
         formValues
       );
-      console.log(response);
     } catch (error) {
       console.error(error);
     }
+    
   };
 
   const handleChange = (e) => {
